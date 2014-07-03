@@ -7,6 +7,8 @@ function Stadium.new(options)
   local self = setmetatable({}, Stadium)
   self.x = 0
   self.y = 0
+  self.width = 800
+  self.height = 600
   self.scaleX = 1
   self.scaleY = 1
   self.rotation = 0

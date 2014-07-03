@@ -11,7 +11,8 @@ function Match.new(options)
   self.milis = 0
   self.team1 = options.team1
   self.team2 = options.team2
-  self.location = options.location
+  self.stadium = options.stadium
+  self.ball = options.ball
   self.isTeam1Attacking = false
   self.isTeam2Attacking = false
   -- Local team, may be team11, team2, or none (like world cup)
@@ -22,7 +23,11 @@ function Match.new(options)
 end
 
 function Match:load()
-	self.location:load()
+	self.stadium:load()
+	self.ball:load()
+	self.ball.x = 400
+	self.ball.y = 300
+
 	self:initPlayerPosition()
 end
 
@@ -49,7 +54,7 @@ function Match:initPlayerPosition()
 end
 
 function Match:draw()
-	self.location:draw()
+	self.stadium:draw()
 
 	-- GUI
 	r, g, b, a = love.graphics.getColor()
@@ -58,10 +63,15 @@ function Match:draw()
 	if (not self.paused) then playState = "paused" end
 	love.graphics.print(string.format('Match time %2d:%2d:%3d.\nPress "p" to %s', self.minutes, self.seconds, self.milis, playState), 70, 10)
 	love.graphics.setColor(r, g, b, a)
+
+	-- Players
 	for i=1, 11 do
 		self.team1.players[i]:draw()
 		self.team2.players[i]:draw()
 	end 
+
+	-- Ball
+	self.ball:draw()
 end
 
 function Match:update(dt)
@@ -76,7 +86,7 @@ function Match:update(dt)
 			self.minutes = self.minutes + 1
 		end
 
-		self.location:update()
+		self.stadium:update()
 	end
 end
 

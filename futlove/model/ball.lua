@@ -10,13 +10,17 @@ function Ball.new(options)
   self.scaleX = 1
   self.scaleY = 1
   self.rotation = 0
-  self.image = options.image
+  self.imageSrc = options.imageSrc
   return self
 end
 
+function Ball:load()
+  self.image = love.graphics.newImage(self.imageSrc)
+end
+
 function Ball:draw()
-	-- minus 10 means minus half our image size, in this case, 20px
-	love.graphics.draw(self.image, self.x - 10, self.y - 10)
+	-- minus 5 means minus half our image size, in this case, 10px
+	love.graphics.draw(self.image, self.x - 5, self.y - 5)
 end
 
 function Ball:update()	

@@ -1,4 +1,4 @@
-SoccerPlayer = require "SoccerPlayer"
+SoccerPlayer = require "model.SoccerPlayer"
 formations = require "formations"
 --[[
 Team module.

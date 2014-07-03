@@ -1,6 +1,13 @@
+-- Hump gamestate - http://vrld.github.io/hump/#hump.gamestate
+Gamestate = require "hump.gamestate"
+
+local matchScene = require "matchScene"
+
+
 teams = require "teams"
-Stadium = require "stadium"
-Match = require "match"
+Stadium = require "model.stadium"
+Match = require "model.match"
+Ball = require "model.ball"
 
 local stadium = nil
 local match = nil
@@ -8,10 +15,17 @@ local match = nil
 function love.load()
 	-- To see live sublime console.
 	io.stdout:setvbuf("no")
-	 
-  -- Prepare/configure match 
+
+  -- Prepare/configure match
   stadium = Stadium.new({ imageSrc = "resources/soccerField800x600.png" })
-  match = Match.new({ team1 = teams.patagonian, team2 = teams.enemies, location = stadium })
+  ball = Ball.new({ imageSrc = "resources/brazuca2.png" })
+  match = Match.new({ team1 = teams.patagonian, team2 = teams.enemies, stadium = stadium, ball = ball })
+	 
+  --Gamestate.registerEvents()
+  print(match)
+  print(match.load)
+  --Gamestate.switch(matchScene, match)
+
 
   -- load match resources
 	match:load()
@@ -24,7 +38,7 @@ function love.draw()
 end
 
 function love.update(dt)
-  match:update(dt)
+  --match:update(dt)
   --[[
    if love.keyboard.isDown("right") then
       x = x + (speed * dt)
@@ -47,6 +61,7 @@ function love.keypressed(k)
     if k == 'escape' then
         love.event.push('quit') -- quit the game
     end
+    -- [[
     if k == 'a' then
       match.isTeam1Attacking = not match.isTeam1Attacking
       match:initPlayerPosition()
@@ -58,4 +73,5 @@ function love.keypressed(k)
     if k == 'p' then
       match.paused = not match.paused
     end
+    --]]
 end

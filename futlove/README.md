@@ -1,4 +1,4 @@
-Love2dPrototypes
-================
+Futlove
+=======
 
-Some prototype for testing the Love2d library and the Lua language
+Soccer manager for testing the Love framework and the Lua language

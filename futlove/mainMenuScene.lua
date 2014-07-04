@@ -1,0 +1,3 @@
+local mainMenuScene = {}
+
+return mainMenuScene

@@ -1,77 +1,26 @@
 -- Hump gamestate - http://vrld.github.io/hump/#hump.gamestate
 Gamestate = require "hump.gamestate"
 
+-- Game scenes
+local mainMenuScene = require "mainMenuScene"
 local matchScene = require "matchScene"
-
-
-teams = require "teams"
-Stadium = require "model.stadium"
-Match = require "model.match"
-Ball = require "model.ball"
-
-local stadium = nil
-local match = nil
 
 function love.load()
 	-- To see live sublime console.
 	io.stdout:setvbuf("no")
 
-  -- Prepare/configure match
-  stadium = Stadium.new({ imageSrc = "resources/soccerField800x600.png" })
-  ball = Ball.new({ imageSrc = "resources/brazuca2.png" })
-  match = Match.new({ team1 = teams.patagonian, team2 = teams.enemies, stadium = stadium, ball = ball })
-	 
-  --Gamestate.registerEvents()
-  print(match)
-  print(match.load)
-  --Gamestate.switch(matchScene, match)
-
-
-  -- load match resources
-	match:load()
+  Gamestate.registerEvents()
+  Gamestate.switch(matchScene)
 end
 
+-- Gamestate is propagating this to the current scene
 function love.draw()
-  -- draw stuff
-  -- love.graphics.print("Hello World", 400, 300)
-  match:draw()
 end
 
+-- Gamestate is propagating this to the current scene
 function love.update(dt)
-  --match:update(dt)
-  --[[
-   if love.keyboard.isDown("right") then
-      x = x + (speed * dt)
-   end
-   if love.keyboard.isDown("left") then
-      x = x - (speed * dt)
-   end
-
-   if love.keyboard.isDown("down") then
-      y = y + (speed * dt)
-   end
-   if love.keyboard.isDown("up") then
-      y = y - (speed * dt)
-   end
-   ]]--
 end
 
+-- Gamestate is propagating this to the current scene
 function love.keypressed(k)
-
-    if k == 'escape' then
-        love.event.push('quit') -- quit the game
-    end
-    -- [[
-    if k == 'a' then
-      match.isTeam1Attacking = not match.isTeam1Attacking
-      match:initPlayerPosition()
-    end
-    if k == 's' then
-      match.isTeam2Attacking = not match.isTeam2Attacking
-      match:initPlayerPosition()
-    end
-    if k == 'p' then
-      match.paused = not match.paused
-    end
-    --]]
 end

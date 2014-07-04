@@ -20,10 +20,9 @@ function Stadium:load()
 	self.image = love.graphics.newImage(self.imageSrc)
 end
 
-function Stadium:draw() 
+function Stadium:draw()
 	love.graphics.draw(self.image, self.x, self.y)
 end
-
 
 function Stadium:update()	
 end

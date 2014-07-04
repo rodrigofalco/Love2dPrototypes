@@ -15,20 +15,23 @@ function Match.new(options)
   self.ball = options.ball
   self.isTeam1Attacking = false
   self.isTeam2Attacking = false
-  -- Local team, may be team11, team2, or none (like world cup)
-  -- self.localTeam = options.localTeam
-  -- self.image = options["image"]
-
+  -- Local team starts the match with the ball
+  self.localTeam = self.team1
   return self
 end
 
 function Match:load()
 	self.stadium:load()
 	self.ball:load()
-	self.ball.x = 400
-	self.ball.y = 300
-
 	self:initPlayerPosition()
+	self:initBallPosition()
+end
+
+function Match:initBallPosition()
+	--self.ball.x = self.localTeam.players[11].x
+	self.ball.x = 400
+	--self.ball.y = self.localTeam.players[11].y
+	self.ball.y = 300
 end
 
 function Match:initPlayerPosition()
@@ -40,7 +43,6 @@ function Match:initPlayerPosition()
 			self.team1.players[i].y = self.team1.formation[i].defense.x
 			self.team1.players[i].x = self.team1.formation[i].defense.y
 		end
-
 		-- in the second team, the formation position is inverted
 		if self.isTeam2Attacking then
 			self.team2.players[i].y = 600 - self.team2.formation[i].attack.x
@@ -49,13 +51,11 @@ function Match:initPlayerPosition()
 			self.team2.players[i].y = 600 - self.team2.formation[i].defense.x
 			self.team2.players[i].x = 800 - self.team2.formation[i].defense.y
 		end
-
 	end
 end
 
 function Match:draw()
 	self.stadium:draw()
-
 	-- GUI
 	r, g, b, a = love.graphics.getColor()
 	love.graphics.setColor(0, 0, 0, 255)
@@ -63,13 +63,11 @@ function Match:draw()
 	if (not self.paused) then playState = "paused" end
 	love.graphics.print(string.format('Match time %2d:%2d:%3d.\nPress "p" to %s', self.minutes, self.seconds, self.milis, playState), 70, 10)
 	love.graphics.setColor(r, g, b, a)
-
 	-- Players
 	for i=1, 11 do
 		self.team1.players[i]:draw()
 		self.team2.players[i]:draw()
 	end 
-
 	-- Ball
 	self.ball:draw()
 end
@@ -85,7 +83,6 @@ function Match:update(dt)
 			self.seconds = self.seconds - 60
 			self.minutes = self.minutes + 1
 		end
-
 		self.stadium:update()
 	end
 end

@@ -7,7 +7,7 @@ local matchScene = {
 }
 
 function matchScene:init()
-  print("matchScene:init")
+  --print("matchScene:init")
   matchScene.stadium = Stadium.new({ imageSrc = "resources/soccerField800x600.png" })
   matchScene.ball = Ball.new({ imageSrc = "resources/brazuca2.png" })
   matchScene.match = Match.new({ 
@@ -20,16 +20,11 @@ function matchScene:init()
 end
 
 function matchScene:enter(previous)
-  print("matchScene:enter")
+  -- print("matchScene:enter")
 end
 
 function matchScene:load()
-  --[[
-  love.physics.setMeter(64) --In our world 1 meter equals 64px
-  world = love.physics.newWorld(0, 9.81*64, true) --create a world for the bodies to exist in with horizontal gravity of 0 and vertical gravity of 9.81
-
-  objects = {} -- table to hold all our physical objects
-  --]]
+  
 end
 
 function matchScene:keyreleased(k, code)
@@ -39,10 +34,10 @@ function matchScene:keyreleased(k, code)
     matchScene.match.paused = not matchScene.match.paused
   elseif k == 'a' then
     matchScene.match.isTeam1Attacking = not matchScene.match.isTeam1Attacking
-    matchScene.match:initPlayerPosition()
+    --matchScene.match:initPlayerPosition()
   elseif k == 's' then
     matchScene.match.isTeam2Attacking = not matchScene.match.isTeam2Attacking
-    matchScene.match:initPlayerPosition()
+    --matchScene.match:initPlayerPosition()
   end
 	--[[
     if key == 'enter' then

@@ -39,19 +39,22 @@ function Match:load()
   -- players init
 	self:initPlayers(world, objects)
 
-	-- initial kick off
+	-- initial ball kick off
 	-- If we do a vector operation substracting the ball position from the player pos
 	-- we obtain the vector from the ball to the player.
 	-- http://www.blancmange.info/notes/maths/vectors/ops/
 	-- Choose team 11th player as target
 	local targetPositionVector = self.localTeam.players[11].pos
-	local sourcePositionVector = self.ball.pos
-	local directionVector = targetPositionVector - sourcePositionVector
+	self:initKickoff(self.localTeam.players[11])
+end
+
+function Match:initKickoff(player)
+	local directionVector = player.pos - self.ball.pos
 	--print(directionVector)
 	--self.ball.body:applyForce(-10000, -10000)
 	self.ball.body:applyForce(directionVector.x * 100, directionVector.y * 100)
-
 end
+
 
 function Match:initPlayers(world, objects)
 	for i=1, 11 do 

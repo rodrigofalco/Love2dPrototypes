@@ -35,38 +35,28 @@ function Match:load()
 	self.ball:load()
 	self.ball:init(world)
   objects.ball = self.ball
-  	-- initial kick off
-	self.ball.body:applyForce(-10000, -10000)
 
   -- players init
 	self:initPlayers(world, objects)
+
+	-- initial kick off
+	-- If we do a vector operation substracting the ball position from the player pos
+	-- we obtain the vector from the ball to the player.
+	-- http://www.blancmange.info/notes/maths/vectors/ops/
+	-- Choose team 11th player as target
+	local targetPositionVector = self.localTeam.players[11].pos
+	local sourcePositionVector = self.ball.pos
+	local directionVector = targetPositionVector - sourcePositionVector
+	--print(directionVector)
+	--self.ball.body:applyForce(-10000, -10000)
+	self.ball.body:applyForce(directionVector.x * 100, directionVector.y * 100)
 
 end
 
 function Match:initPlayers(world, objects)
 	for i=1, 11 do 
 		self.team1.players[i]:init(world, self, self.team1)
-		--self.team1.players[i]:setFormation(self.team1.formation[i])
-
 		self.team2.players[i]:init(world, self, self.team2)
-		--self.team2.players[i]:setFormation(self.team2.formation[i])
-		--[[
-		if self.isTeam1Attacking then
-			self.team1.players[i].body:setY(self.team1.formation[i].attack.x)
-			self.team1.players[i].body:setX(self.team1.formation[i].attack.y)
-		else
-			self.team1.players[i].body:setY(self.team1.formation[i].defense.x)
-			self.team1.players[i].body:setX(self.team1.formation[i].defense.y)
-		end
-		-- in the second team, the formation position is inverted
-		if self.isTeam2Attacking then
-			self.team2.players[i].body:setY(600 - self.team2.formation[i].attack.x)
-			self.team2.players[i].body:setX(800 - self.team2.formation[i].attack.y)
-		else
-			self.team2.players[i].body:setY(600 - self.team2.formation[i].defense.x)
-			self.team2.players[i].body:setX(800 - self.team2.formation[i].defense.y)
-		end
-		--]]
 	end
 end
 
@@ -101,7 +91,8 @@ function Match:update(dt)
 			self.seconds = self.seconds - 60
 			self.minutes = self.minutes + 1
 		end
-		self.stadium:update()
+		self.stadium:update(dt)
+		self.ball:update(dt)
 	end
 end
 

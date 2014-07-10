@@ -24,7 +24,7 @@ function Stadium:draw()
 	love.graphics.draw(self.image, self.x, self.y)
 end
 
-function Stadium:update()	
+function Stadium:update(dt)	
 end
 
 return Stadium

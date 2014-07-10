@@ -11,8 +11,8 @@ function matchScene:init()
   matchScene.stadium = Stadium.new({ imageSrc = "resources/soccerField800x600.png" })
   matchScene.ball = Ball.new({ imageSrc = "resources/brazuca2.png" })
   matchScene.match = Match.new({ 
-      team1 = teams.patagonian, 
-      team2 = teams.enemies, 
+      team1 = teams.patagonian,
+      team2 = teams.enemies,
       stadium = matchScene.stadium, 
       ball = matchScene.ball 
   })

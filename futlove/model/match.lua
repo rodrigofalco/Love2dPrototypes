@@ -16,7 +16,9 @@ function Match.new(options)
   self.isTeam1Attacking = false
   self.isTeam2Attacking = false
   -- Local team starts the match with the ball
+
   self.localTeam = self.team1
+  self.attackingTeam = self.team1
   return self
 end
 
@@ -44,8 +46,8 @@ function Match:load()
 	-- we obtain the vector from the ball to the player.
 	-- http://www.blancmange.info/notes/maths/vectors/ops/
 	-- Choose team 11th player as target
-	local targetPositionVector = self.localTeam.players[11].pos
-	self:initKickoff(self.localTeam.players[11])
+	local targetPositionVector = self.attackingTeam.players[11].pos
+	self:initKickoff(self.attackingTeam.players[11])
 end
 
 function Match:initKickoff(player)
@@ -96,7 +98,15 @@ function Match:update(dt)
 		end
 		self.stadium:update(dt)
 		self.ball:update(dt)
+		for i=1, 11 do
+			self.team1.players[i]:update(dt)
+			self.team2.players[i]:update(dt)
+		end 
 	end
+end
+
+function Match:isTeamDefending(team)
+	return self.attackingTeam == team
 end
 
 return Match

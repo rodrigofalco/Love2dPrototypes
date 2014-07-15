@@ -16,7 +16,7 @@ function SoccerPlayer.new(options)
 end
 
 function SoccerPlayer:init(world, match, team)
-  print("Init:" .. self.name)
+  --print("Init:" .. self.name)
   -- physics
   self.body = love.physics.newBody(world, self.pos.x, self.pos.y, "dynamic")
   self.shape = love.physics.newCircleShape(10) --the ball's shape has a radius of 20
@@ -24,6 +24,7 @@ function SoccerPlayer:init(world, match, team)
   self.fixture:setRestitution(0.05)
   self.fixture:setUserData("Player")
 
+  self.match = match
   self.team = team
   self.isMyTeamLocal = (team == match.localTeam)
   self:setFormation(team.formation)
@@ -53,11 +54,56 @@ function SoccerPlayer:draw()
 	love.graphics.draw(self.image, self.pos.x - 10, self.pos.y - 10)
 end
 
-function SoccerPlayer:update()
+function SoccerPlayer:update(dt)
   -- get position from physics engine
   local x, y = self.body:getPosition()
   -- update our position vector if needed
   if not (x == self.pos.x) or not (y == self.pos.y) then self.pos = vector(x, y) end
+
+  -- IA v0.000001
+
+  if self:isTeamDefending() then
+    -- print(self.name .. " is Defending")
+    self:defend(dt)
+  else
+    -- print(self.name .. " is Attacking")
+    self:attack(dt)
+  end
+
+end
+
+function SoccerPlayer:isTeamDefending()
+  return self.match:isTeamDefending(self.team)
+end
+
+-- move and play as defender
+function SoccerPlayer:defend(dt)
+  -- defending means moveing towards the ideal defensive position, the one in the formation.defense object
+  local tacticalPosition = vector(self.formation.defense.y, self.formation.defense.x)
+  if (not self.isMyTeamLocal) then
+    tacticalPosition = vector(800 - self.formation.defense.y, 600 - self.formation.defense.x)
+  end
+
+  -- accelerate to target position
+  local distanceVector = tacticalPosition - self.pos
+  --print(directionVector)
+  --self.ball.body:applyForce(-10000, -10000)
+  self.body:applyForce(distanceVector.x * 100 * dt, distanceVector.y * 100 * dt)
+end
+
+-- move and play as attacker
+function SoccerPlayer:attack(dt)
+  -- attacking means moveing towards the ideal attacking position, the one in the formation.attack object
+  local tacticalPosition = vector(self.formation.attack.y, self.formation.attack.x)
+  if (not self.isMyTeamLocal) then
+    tacticalPosition = vector(800 - self.formation.attack.y, 600 - self.formation.attack.x)
+  end
+
+   -- accelerate to target position
+  local distanceVector = tacticalPosition - self.pos
+  --print(directionVector)
+  --self.ball.body:applyForce(-10000, -10000)
+  self.body:applyForce(distanceVector.x * 100 * dt, distanceVector.y * 100 * dt)
 end
 
 return SoccerPlayer

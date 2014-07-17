@@ -104,15 +104,11 @@ function SoccerPlayer:defend(dt)
   local playerSpeed = (vx + vy) * dt
   local acc = self.stats.acceleration * accelarationAdjustment * dt
 
-  if playerSpeed <  ((1 / 10) * self.stats.maxSpeed ) and distanceMts > 20 then
+  if playerSpeed <  ((1 / 10) * self.stats.maxSpeed ) and distanceMts > 30 then
     self.body:applyForce(normalizedDistanceVector.x * acc, normalizedDistanceVector.y * acc)
   end
 
-  if (distanceMts <= 20) then
-    -- stop
-
-  -- print(self.index .. " velocity:" .. ((vx + vy) * dt))
-  end
+  
 end
 
 -- move and play as attacker
@@ -139,15 +135,11 @@ function SoccerPlayer:attack(dt)
   local playerSpeed = (vx + vy) * dt
   local acc = self.stats.acceleration * accelarationAdjustment * dt
 
-  if playerSpeed <  ((1 / 10) * self.stats.maxSpeed ) and distanceMts > 20 then
+  if playerSpeed <  ((1 / 10) * self.stats.maxSpeed ) and distanceMts > 30 then
     self.body:applyForce(normalizedDistanceVector.x * acc, normalizedDistanceVector.y * acc)
   end
 
-  if (distanceMts <= 20) then
-    -- stop
-
-  -- print(self.index .. " velocity:" .. ((vx + vy) * dt))
-  end
+ 
   
 end
 

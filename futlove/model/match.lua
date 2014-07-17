@@ -13,10 +13,13 @@ function Match.new(options)
   self.team2 = options.team2
   self.stadium = options.stadium
   self.ball = options.ball
+
+
   
   -- Local team starts the match with the ball
 	self.localTeam = self.team1
   self.attackingTeam = self.team1
+
   return self
 end
 
@@ -96,15 +99,44 @@ function Match:update(dt)
 		end
 		self.stadium:update(dt)
 		self.ball:update(dt)
+
+		-- precalculate some stuff, like distance from each player to the ball.
+		self:preCalculatePlayerData(dt)
 		for i=1, 11 do
 			self.team1.players[i]:update(dt)
 			self.team2.players[i]:update(dt)
 		end 
-	end
+	end 
+
+end
+
+function Match:preCalculatePlayerData(dt)
+	self.team1.minBallDistance = 9999999999999
+  self.team2.minBallDistance = 9999999999999
+	for i=1, 11 do
+		--print("#11 " .. self.team1.players[i].pos.x)
+		--print("#12 " .. self.ball.pos.x)
+		self.team1.players[i].ballDistance = (self.team1.players[i].pos - self.ball.pos):len()
+		--print("#13 " .. self.team1.players[i].ballDistance)
+		--print("#14 " .. self.team1.minBallDistance)
+		if (self.team1.players[i].ballDistance < self.team1.minBallDistance) then
+			self.team1.minBallDistance = self.team1.players[i].ballDistance
+			self.team1.minBallDistanceIndex = i
+		end
+		self.team2.players[i].ballDistance = (self.team2.players[i].pos - self.ball.pos):len()
+		if (self.team2.players[i].ballDistance < self.team2.minBallDistance) then
+			self.team2.minBallDistance = self.team2.players[i].ballDistance
+			self.team2.minBallDistanceIndex = i
+		end
+	end 
+
+	print("T1:" .. self.team1.players[self.team1.minBallDistanceIndex].name)
+	print("T2:" .. self.team2.players[self.team2.minBallDistanceIndex].name)
+
 end
 
 function Match:isTeamDefending(team)
-	return self.attackingTeam == team
+	return not (self.attackingTeam == team)
 end
 
 return Match

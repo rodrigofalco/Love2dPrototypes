@@ -13,11 +13,9 @@ function Match.new(options)
   self.team2 = options.team2
   self.stadium = options.stadium
   self.ball = options.ball
-  self.isTeam1Attacking = false
-  self.isTeam2Attacking = false
+  
   -- Local team starts the match with the ball
-
-  self.localTeam = self.team1
+	self.localTeam = self.team1
   self.attackingTeam = self.team1
   return self
 end

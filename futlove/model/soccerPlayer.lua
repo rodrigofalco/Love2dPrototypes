@@ -1,5 +1,7 @@
 vector = require "hump.vector"
 
+local accelarationAdjustment = 30000
+
 local SoccerPlayer = {} -- the table representing the class, which will double as the metatable for the instances
 SoccerPlayer.__index = SoccerPlayer -- failed table lookups on the instances should fallback to the class table, to get methods
 
@@ -12,6 +14,7 @@ function SoccerPlayer.new(options)
   self.number = options.number
   self.name = options.name
   self.image = options.image
+  self.stats = options.stats or { maxSpeed = 5.0, acceleration = 5.0 }
   return self
 end
 
@@ -22,6 +25,7 @@ function SoccerPlayer:init(world, match, team)
   self.shape = love.physics.newCircleShape(10) --the ball's shape has a radius of 20
   self.fixture = love.physics.newFixture(self.body, self.shape, 5) -- Attach fixture to body and give it a density of 1.
   self.fixture:setRestitution(0.05)
+  self.body:setLinearDamping(0.9)
   self.fixture:setUserData("Player")
 
   self.match = match
@@ -84,11 +88,31 @@ function SoccerPlayer:defend(dt)
     tacticalPosition = vector(800 - self.formation.defense.y, 600 - self.formation.defense.x)
   end
 
-  -- accelerate to target position
+   -- This is the distance and direction
   local distanceVector = tacticalPosition - self.pos
-  --print(directionVector)
-  --self.ball.body:applyForce(-10000, -10000)
-  self.body:applyForce(distanceVector.x * 100 * dt, distanceVector.y * 100 * dt)
+  local distanceMts = distanceVector:len()
+
+  -- only for player 11
+  if (self.index == 10) then
+    --print("Player 10 distance to tactical goal:" .. distanceMts)
+  end
+
+  -- this will only have direction
+  local normalizedDistanceVector = distanceVector:normalized()
+
+  local vx, vy = self.body:getLinearVelocity()
+  local playerSpeed = (vx + vy) * dt
+  local acc = self.stats.acceleration * accelarationAdjustment * dt
+
+  if playerSpeed <  ((1 / 10) * self.stats.maxSpeed ) and distanceMts > 20 then
+    self.body:applyForce(normalizedDistanceVector.x * acc, normalizedDistanceVector.y * acc)
+  end
+
+  if (distanceMts <= 20) then
+    -- stop
+
+  -- print(self.index .. " velocity:" .. ((vx + vy) * dt))
+  end
 end
 
 -- move and play as attacker
@@ -99,11 +123,32 @@ function SoccerPlayer:attack(dt)
     tacticalPosition = vector(800 - self.formation.attack.y, 600 - self.formation.attack.x)
   end
 
-   -- accelerate to target position
+   -- This is the distance and direction
   local distanceVector = tacticalPosition - self.pos
-  --print(directionVector)
-  --self.ball.body:applyForce(-10000, -10000)
-  self.body:applyForce(distanceVector.x * 100 * dt, distanceVector.y * 100 * dt)
+  local distanceMts = distanceVector:len()
+
+  -- only for player 11
+  if (self.index == 10) then
+    --print("Player 10 distance to tactical goal:" .. distanceMts)
+  end
+
+  -- this will only have direction
+  local normalizedDistanceVector = distanceVector:normalized()
+
+  local vx, vy = self.body:getLinearVelocity()
+  local playerSpeed = (vx + vy) * dt
+  local acc = self.stats.acceleration * accelarationAdjustment * dt
+
+  if playerSpeed <  ((1 / 10) * self.stats.maxSpeed ) and distanceMts > 20 then
+    self.body:applyForce(normalizedDistanceVector.x * acc, normalizedDistanceVector.y * acc)
+  end
+
+  if (distanceMts <= 20) then
+    -- stop
+
+  -- print(self.index .. " velocity:" .. ((vx + vy) * dt))
+  end
+  
 end
 
 return SoccerPlayer

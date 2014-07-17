@@ -33,10 +33,10 @@ function matchScene:keyreleased(k, code)
   elseif k == 'p' then
     matchScene.match.paused = not matchScene.match.paused
   elseif k == 'a' then
-    matchScene.match.isTeam1Attacking = not matchScene.match.isTeam1Attacking
+    matchScene.match.attackingTeam = matchScene.match.team1
     --matchScene.match:initPlayerPosition()
   elseif k == 's' then
-    matchScene.match.isTeam2Attacking = not matchScene.match.isTeam2Attacking
+    matchScene.match.attackingTeam = matchScene.match.team2
     --matchScene.match:initPlayerPosition()
   end
 	--[[

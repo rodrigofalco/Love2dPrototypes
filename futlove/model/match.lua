@@ -130,8 +130,8 @@ function Match:preCalculatePlayerData(dt)
 		end
 	end 
 
-	print("T1:" .. self.team1.players[self.team1.minBallDistanceIndex].name)
-	print("T2:" .. self.team2.players[self.team2.minBallDistanceIndex].name)
+	--print("T1:" .. self.team1.players[self.team1.minBallDistanceIndex].name)
+	--print("T2:" .. self.team2.players[self.team2.minBallDistanceIndex].name)
 
 end
 

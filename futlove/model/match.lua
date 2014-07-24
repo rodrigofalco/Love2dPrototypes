@@ -14,7 +14,8 @@ function Match.new(options)
   self.stadium = options.stadium
   self.ball = options.ball
 
-
+  -- Execute operations on workd objects after world locked.
+  self.postExecute = {}
   
   -- Local team starts the match with the ball
 	self.localTeam = self.team1
@@ -29,6 +30,7 @@ function Match:load()
   love.physics.setMeter(6.7)
    --create a world for the bodies to exist in with horizontal gravity of 0 and vertical gravity of 0 -- 9.81 earth gravity
   world = love.physics.newWorld(0, 0, true)
+  world:setCallbacks(self.beginContact, self.endContact, self.preSolve, self.postSolve)
   objects = {} -- table to hold all our physical objects
 
   -- stadium init
@@ -87,6 +89,13 @@ end
 
 function Match:update(dt)
 	if not self.paused then
+
+		-- Check if ball controll has changed
+		if not (self.ball.currentPlayer == self.ball.lastPlayer) then
+			self.ball.lastPlayer = self.ball.currentPlayer
+			self.ball.body:setActive(false)
+		end
+
 		world:update(dt)
 		self.milis = self.milis + dt * 1000 * self.matchSpeed
 		while self.milis > 999 do
@@ -137,6 +146,65 @@ end
 
 function Match:isTeamDefending(team)
 	return not (self.attackingTeam == team)
+end
+
+-- Match physics
+function Match.beginContact(a, b, coll)
+	local contactBetweenPlayerAndBall, ball, player = Match.isContactBetweenPlayerAndBall(a, b)
+	if (contactBetweenPlayerAndBall) then
+    print(player.name .. " touches the ball")
+    -- self.postExecute
+    --self.postExecute.ballControll = function() ball.body:setActive(false) end
+	end
+	--[[
+   if (a:getUserData().type == 'Ball' and b:getUserData().type == 'SoccerPlayer') or  (b:getUserData().type == 'Ball' and a:getUserData().type == 'SoccerPlayer') then
+   	-- if its a contact between a player and the ball, the player may take control of the ball if it's comming slow.
+   	local ball = b:getUserData()
+   	local player = a:getUserData()
+   	if (a:getUserData().type == 'Ball') then
+   		ball = a:getUserData()
+   		player = b:getUserData()
+
+   		ball.body:setActive(false)
+   	end
+   	
+   	-- ball.body:setActive(false)
+   end
+	--]]
+end
+
+-- Returns true/false + ball, player in case of true
+function Match.isContactBetweenPlayerAndBall(a, b)
+	if (a:getUserData().type == 'Ball' and b:getUserData().type == 'SoccerPlayer') or  (b:getUserData().type == 'Ball' and a:getUserData().type == 'SoccerPlayer') then
+		-- contact between player and ball
+		local ball = b:getUserData()
+   	local player = a:getUserData()
+   	if (a:getUserData().type == 'Ball') then
+   		ball = a:getUserData()
+   		player = b:getUserData()
+   	end
+   	return true, ball, player
+	else
+		-- contact between other objects
+		return false
+	end
+end
+
+function Match.endContact(a, b, coll)
+    --print(a:getUserData().type .. " endContact with " .. b:getUserData().type)
+    local contactBetweenPlayerAndBall, ball, player = Match.isContactBetweenPlayerAndBall(a, b)
+	if (contactBetweenPlayerAndBall) then
+    print(player.name .. " end touches the ball")
+    ball.currentPlayer = player
+	end
+end
+
+function Match.preSolve(a, b, coll)
+    --print(a:getUserData().type .. " preSolve with " .. b:getUserData().type)
+end
+
+function Match.postSolve(a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2)
+    --print(a:getUserData().type .. " postSolve with " .. b:getUserData().type)
 end
 
 return Match

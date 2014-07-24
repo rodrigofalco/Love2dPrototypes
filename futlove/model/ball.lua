@@ -11,6 +11,7 @@ function Ball.new(options)
   self.scaleY = 1
   self.rotation = 0
   self.imageSrc = options.imageSrc
+  self.type = 'Ball'
   return self
 end
 
@@ -22,7 +23,7 @@ function Ball:init(world)
   self.shape = love.physics.newCircleShape(5) --the ball's shape has a radius of 20
   self.fixture = love.physics.newFixture(self.body, self.shape, 1) -- Attach fixture to body and give it a density of 1.
   self.fixture:setRestitution(0.5) --let the ball bounce
-  self.fixture:setUserData("Ball")
+  self.fixture:setUserData(self) -- we get this in the colission callback later
 end
 
 function Ball:load()

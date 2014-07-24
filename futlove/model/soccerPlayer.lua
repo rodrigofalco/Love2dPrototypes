@@ -15,6 +15,7 @@ function SoccerPlayer.new(options)
   self.name = options.name
   self.image = options.image
   self.stats = options.stats or { maxSpeed = 5.0, acceleration = 5.0 }
+  self.type = 'SoccerPlayer'
   return self
 end
 
@@ -26,7 +27,7 @@ function SoccerPlayer:init(world, match, team)
   self.fixture = love.physics.newFixture(self.body, self.shape, 5) -- Attach fixture to body and give it a density of 1.
   self.fixture:setRestitution(0.05)
   self.body:setLinearDamping(0.9)
-  self.fixture:setUserData("Player")
+  self.fixture:setUserData(self) -- we get this in the colission callback later
 
   self.match = match
   self.team = team
@@ -159,7 +160,7 @@ function SoccerPlayer:attackClosestToBall(dt)
   local playerSpeed = (vx + vy) * dt
   local acc = self.stats.acceleration * accelarationAdjustment * dt
 
-  print(distanceMts)
+  --print(distanceMts)
   if (distanceMts > 20) then
     -- go to the ball
     if playerSpeed <  ((1 / 10) * self.stats.maxSpeed ) then

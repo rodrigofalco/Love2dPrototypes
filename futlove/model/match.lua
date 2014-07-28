@@ -1,10 +1,12 @@
 local Match = {} -- the table representing the class, which will double as the metatable for the instances
 Match.__index = Match -- failed table lookups on the instances should fallback to the class table, to get methods
 
+local latestMatchInstance = nil
+
 -- syntax equivalent to "Match.new = function..."
 function Match.new(options)
   local self = setmetatable({}, Match)
-  self.paused = true
+  self.paused = false
   self.matchSpeed = 2 -- twice as fast
   self.minutes = 0
   self.seconds = 0
@@ -13,14 +15,13 @@ function Match.new(options)
   self.team2 = options.team2
   self.stadium = options.stadium
   self.ball = options.ball
+  self.currentPlayerWithBall = nil
+  self.latestPlayerWithBall = nil
 
-  -- Execute operations on workd objects after world locked.
-  self.postExecute = {}
-  
   -- Local team starts the match with the ball
 	self.localTeam = self.team1
   self.attackingTeam = self.team1
-
+	latestMatchInstance = self
   return self
 end
 
@@ -53,11 +54,10 @@ function Match:load()
 	self:initKickoff(self.attackingTeam.players[11])
 end
 
+-- Sends ball towards the given player
 function Match:initKickoff(player)
 	local directionVector = player.pos - self.ball.pos
-	--print(directionVector)
-	--self.ball.body:applyForce(-10000, -10000)
-	self.ball.body:applyForce(directionVector.x * 100, directionVector.y * 100)
+	self.ball.body:applyForce(directionVector.x * 100000, directionVector.y * 100000)
 end
 
 
@@ -90,9 +90,9 @@ end
 function Match:update(dt)
 	if not self.paused then
 
-		-- Check if ball controll has changed
-		if not (self.ball.currentPlayer == self.ball.lastPlayer) then
-			self.ball.lastPlayer = self.ball.currentPlayer
+		-- Check if ball controll has changed since last update cycle
+		if not (self.currentPlayerWithBall == self.latestPlayerWithBall) then
+			self.latestPlayerWithBall = self.currentPlayerWithBall
 			self.ball.body:setActive(false)
 		end
 
@@ -150,27 +150,26 @@ end
 
 -- Match physics
 function Match.beginContact(a, b, coll)
-	local contactBetweenPlayerAndBall, ball, player = Match.isContactBetweenPlayerAndBall(a, b)
-	if (contactBetweenPlayerAndBall) then
-    print(player.name .. " touches the ball")
-    -- self.postExecute
-    --self.postExecute.ballControll = function() ball.body:setActive(false) end
-	end
-	--[[
-   if (a:getUserData().type == 'Ball' and b:getUserData().type == 'SoccerPlayer') or  (b:getUserData().type == 'Ball' and a:getUserData().type == 'SoccerPlayer') then
-   	-- if its a contact between a player and the ball, the player may take control of the ball if it's comming slow.
-   	local ball = b:getUserData()
-   	local player = a:getUserData()
-   	if (a:getUserData().type == 'Ball') then
-   		ball = a:getUserData()
-   		player = b:getUserData()
+end
 
-   		ball.body:setActive(false)
-   	end
-   	
-   	-- ball.body:setActive(false)
-   end
-	--]]
+function Match.preSolve(a, b, coll)
+end
+
+function Match.postSolve(a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2)
+end
+
+function Match.endContact(a, b, coll)
+  --print(a:getUserData().type .. " endContact with " .. b:getUserData().type)
+  local contactBetweenPlayerAndBall, ball, player = Match.isContactBetweenPlayerAndBall(a, b)
+	if (contactBetweenPlayerAndBall) then
+		x,y = coll:getNormal()
+    print(player.name .. " collides with ball -> vector normal: "..x..", "..y)
+    
+    ball.currentPlayer = player
+		latestMatchInstance.currentPlayerWithBall = player
+	else
+		print(player.name .. " collides with player -> vector normal: "..x..", "..y)
+	end
 end
 
 -- Returns true/false + ball, player in case of true
@@ -186,25 +185,8 @@ function Match.isContactBetweenPlayerAndBall(a, b)
    	return true, ball, player
 	else
 		-- contact between other objects
-		return false
+		return false, a:getUserData(), b:getUserData()
 	end
-end
-
-function Match.endContact(a, b, coll)
-    --print(a:getUserData().type .. " endContact with " .. b:getUserData().type)
-    local contactBetweenPlayerAndBall, ball, player = Match.isContactBetweenPlayerAndBall(a, b)
-	if (contactBetweenPlayerAndBall) then
-    print(player.name .. " end touches the ball")
-    ball.currentPlayer = player
-	end
-end
-
-function Match.preSolve(a, b, coll)
-    --print(a:getUserData().type .. " preSolve with " .. b:getUserData().type)
-end
-
-function Match.postSolve(a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2)
-    --print(a:getUserData().type .. " postSolve with " .. b:getUserData().type)
 end
 
 return Match

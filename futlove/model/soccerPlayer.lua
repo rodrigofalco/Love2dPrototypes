@@ -66,14 +66,23 @@ function SoccerPlayer:update(dt)
   if not (x == self.pos.x) or not (y == self.pos.y) then self.pos = vector(x, y) end
 
   -- IA v0.000001
-
   if self:isTeamDefending() then
     -- print(self.name .. " is Defending")
-    self:defend(dt)
+    if (self.team.minBallDistanceIndex == self.index) then
+      -- im the closest to the ball
+      self:defendClosestToBall(dt)
+    else
+      self:defend(dt)
+    end
+    
   else
     -- print(self.name .. " is Attacking")
-    -- see if we are the closer to the ball.
-    if (self.team.minBallDistanceIndex == self.index) then
+    -- check if we are in controll of the ball
+    if (self.match.currentPlayerWithBall == self) then
+      -- I have the ball
+      -- im the closest to the ball
+      self:attackWithBall(dt)
+    elseif (self.team.minBallDistanceIndex == self.index) then
       -- im the closest to the ball
       self:attackClosestToBall(dt)
     else
@@ -149,6 +158,31 @@ function SoccerPlayer:attackNoBall(dt)
   
 end
 
+function SoccerPlayer:defendClosestToBall(dt)
+  -- This is the distance and direction
+  local distanceVector = self.match.ball.pos - self.pos
+  local distanceMts = distanceVector:len()
+  -- this will only have direction
+  local normalizedDistanceVector = distanceVector:normalized()
+
+  local vx, vy = self.body:getLinearVelocity()
+  local playerSpeed = (vx + vy) * dt
+  local acc = self.stats.acceleration * accelarationAdjustment * dt
+
+  --print(distanceMts)
+  if (distanceMts > 20) then
+    -- go to the ball
+    if playerSpeed <  ((1 / 10) * self.stats.maxSpeed ) then
+      self.body:applyForce(normalizedDistanceVector.x * acc, normalizedDistanceVector.y * acc)
+    end
+  else 
+    -- ball is in reach
+    --self.match.ball.body:setLinearVelocity(0, 0)
+    --self.body:setLinearVelocity(0, 0)
+  end
+end
+
+
 function SoccerPlayer:attackClosestToBall(dt)
   -- This is the distance and direction
   local distanceVector = self.match.ball.pos - self.pos
@@ -173,4 +207,42 @@ function SoccerPlayer:attackClosestToBall(dt)
   end
 end
 
+-- move and play as attacker
+function SoccerPlayer:attackWithBall(dt)
+  -- center ball on us
+  local ball = self.match.ball
+  ball.body:setPosition(self.body:getPosition())
+
+
+  --.body:getPosition()
+   --print("Ball" .. ball)
+  --[[
+  -- attacking means moveing towards the ideal attacking position, the one in the formation.attack object
+  local tacticalPosition = vector(self.formation.attack.y, self.formation.attack.x)
+  if (not self.isMyTeamLocal) then
+    tacticalPosition = vector(800 - self.formation.attack.y, 600 - self.formation.attack.x)
+  end
+
+   -- This is the distance and direction
+  local distanceVector = tacticalPosition - self.pos
+  local distanceMts = distanceVector:len()
+
+  -- only for player 11
+  if (self.index == 10) then
+    --print("Player 10 distance to tactical goal:" .. distanceMts)
+  end
+
+  -- this will only have direction
+  local normalizedDistanceVector = distanceVector:normalized()
+
+  local vx, vy = self.body:getLinearVelocity()
+  local playerSpeed = (vx + vy) * dt
+  local acc = self.stats.acceleration * accelarationAdjustment * dt
+
+  if playerSpeed <  ((1 / 10) * self.stats.maxSpeed ) and distanceMts > 30 then
+    self.body:applyForce(normalizedDistanceVector.x * acc, normalizedDistanceVector.y * acc)
+  end
+  --]]
+  
+end
 return SoccerPlayer

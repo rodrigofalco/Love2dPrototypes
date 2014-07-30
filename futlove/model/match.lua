@@ -1,6 +1,10 @@
 local Match = {} -- the table representing the class, which will double as the metatable for the instances
 Match.__index = Match -- failed table lookups on the instances should fallback to the class table, to get methods
 
+Match.config = {}
+Match.config.engine = {}
+Match.config.engine.accelarationAdjustment = 30000
+
 local latestMatchInstance = nil
 
 -- syntax equivalent to "Match.new = function..."

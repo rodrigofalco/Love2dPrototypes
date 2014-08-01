@@ -1,5 +1,7 @@
 vector = require "hump.vector"
 
+local debugInfoEnabled = true
+
 -- Player states/behaiviours 
 DefensiveState = require "model.states.defensiveState"
 DefensiveClosestToBallState = require "model.states.defensiveClosestToBallState"
@@ -66,6 +68,12 @@ end
 function SoccerPlayer:draw()
 	-- minus 10 means minus half our image size, in this case, 20px
 	love.graphics.draw(self.image, self.pos.x - 10, self.pos.y - 10)
+
+  if debugInfoEnabled then
+    local x, y = self.body:getLinearVelocity()
+    love.graphics.line(self.pos.x, self.pos.y, self.pos.x + x, self.pos.y + y)
+    love.graphics.circle( "line", self.pos.x, self.pos.y, 40, 50 )
+  end
 end
 
 function SoccerPlayer:update(dt)
@@ -74,37 +82,79 @@ function SoccerPlayer:update(dt)
   -- update our position vector if needed
   if not (x == self.pos.x) or not (y == self.pos.y) then self.pos = vector(x, y) end
 
-  -- IA v0.000001
+  -- IA v0.00002
   if self:isTeamDefending() then
-    -- print(self.name .. " is Defending")
-    if (self.team.minBallDistanceIndex == self.index) then
+    if (self.team.minBallDistancePlayer == self) then
       -- im the closest to the ball
-      --self:defendClosestToBall(dt)
-      DefensiveClosestToBallState.updatePlayerState(dt, self)
+      self.currentState = DefensiveClosestToBallState
     else
-      DefensiveState.updatePlayerState(dt, self)
+      self.currentState = DefensiveState
     end
     
   else
-    -- print(self.name .. " is Attacking")
     -- check if we are in controll of the ball
     if (self.match.currentPlayerWithBall == self) then
       -- I have the ball
       -- im the closest to the ball
-      OffensiveWithBallState.updatePlayerState(dt, self)
-    elseif (self.team.minBallDistanceIndex == self.index) then
+      self.currentState = OffensiveWithBallState
+    elseif (self.team.minBallDistancePlayer == self) then
       -- im the closest to the ball
-      OffensiveClosestToBallState.updatePlayerState(dt, self)
+      self.currentState = OffensiveClosestToBallState
     else
-      OffensiveState.updatePlayerState(dt, self)
+      self.currentState = OffensiveState
     end
     
   end
+
+  self.currentState.updatePlayerState(dt, self)
   
 end
 
 function SoccerPlayer:isTeamDefending()
   return self.match:isTeamDefending(self.team)
+end
+
+function SoccerPlayer:moveTo(dt, position, slowdown)
+
+   -- This is the distance and direction
+  local distanceVector = position - self.pos
+  local distanceMts = distanceVector:len()
+
+  -- only for player 11/Debug
+  if (self.index == 10) then
+    --print("Player 10 distance to tactical goal:" .. distanceMts)
+  end
+
+  -- this will only have direction
+  local normalizedDistanceVector = distanceVector:normalized()
+
+  local vx, vy = self.body:getLinearVelocity()
+  local playerSpeed = (vx + vy) * dt
+  local acc = self.stats.acceleration * self.match.config.engine.accelarationAdjustment * dt
+
+  if playerSpeed <  ((1 / 10) * self.stats.maxSpeed )then
+    if distanceMts > 25 or not slowdown  then
+      self.body:applyForce(normalizedDistanceVector.x * acc, normalizedDistanceVector.y * acc)
+    end
+    -- or deaccelerate
+  end
+end
+
+function SoccerPlayer:passBallTo(dt, target)
+  print("pass:" .. self.name .. " passes to " .. target.name)
+  local targetVelx, targetVely = target.body:getLinearVelocity()
+  local targetVector = vector(target.pos.x + targetVelx, target.pos.y + targetVely)
+  local distanceVector = targetVector - self.pos
+  local normalizedDistanceVector = distanceVector:normalized()
+  --normalizedDistanceVector
+  local x, y = self.match.ball.body:getPosition()
+
+  self.match.ball.body:setPosition(x + normalizedDistanceVector.x * 15, y + normalizedDistanceVector.y * 15)
+  
+  self.match.ball.body:setAwake(true)
+
+  self.match.ball.body:applyForce(normalizedDistanceVector.x * 10000 , normalizedDistanceVector.y * 10000)
+  self.match.currentPlayerWithBall = nil
 end
 
 return SoccerPlayer

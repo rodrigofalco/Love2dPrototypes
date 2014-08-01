@@ -12,26 +12,7 @@ function OffensiveState.updatePlayerState(dt, player)
   if (not player.isMyTeamLocal) then
     tacticalPosition = vector(800 - player.formation.attack.y, 600 - player.formation.attack.x)
   end
-
-   -- This is the distance and direction
-  local distanceVector = tacticalPosition - player.pos
-  local distanceMts = distanceVector:len()
-
-  -- only for player 11
-  if (player.index == 10) then
-    --print("Player 10 distance to tactical goal:" .. distanceMts)
-  end
-
-  -- this will only have direction
-  local normalizedDistanceVector = distanceVector:normalized()
-
-  local vx, vy = player.body:getLinearVelocity()
-  local playerSpeed = (vx + vy) * dt
-  local acc = player.stats.acceleration * player.match.config.engine.accelarationAdjustment * dt
-
-  if playerSpeed <  ((1 / 10) * player.stats.maxSpeed ) and distanceMts > 30 then
-    player.body:applyForce(normalizedDistanceVector.x * acc, normalizedDistanceVector.y * acc)
-  end
+  player:moveTo(dt, tacticalPosition, true)
   
 end
 

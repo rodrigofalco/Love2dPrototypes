@@ -97,7 +97,7 @@ function Match:update(dt)
 		-- Check if ball controll has changed since last update cycle
 		if not (self.currentPlayerWithBall == self.latestPlayerWithBall) then
 			self.latestPlayerWithBall = self.currentPlayerWithBall
-			self.ball.body:setActive(false)
+			self.ball.body:setAwake(false)
 		end
 
 		world:update(dt)
@@ -123,28 +123,47 @@ function Match:update(dt)
 
 end
 
+--[[
+This method is called each frame, to pre-calculate some things.
+For example, the distance from the ball to each player, and the distance between 
+all players. 
+--]]
 function Match:preCalculatePlayerData(dt)
+	-- Initialize variables
 	self.team1.minBallDistance = 9999999999999
   self.team2.minBallDistance = 9999999999999
 	for i=1, 11 do
-		--print("#11 " .. self.team1.players[i].pos.x)
-		--print("#12 " .. self.ball.pos.x)
-		self.team1.players[i].ballDistance = (self.team1.players[i].pos - self.ball.pos):len()
-		--print("#13 " .. self.team1.players[i].ballDistance)
-		--print("#14 " .. self.team1.minBallDistance)
-		if (self.team1.players[i].ballDistance < self.team1.minBallDistance) then
-			self.team1.minBallDistance = self.team1.players[i].ballDistance
-			self.team1.minBallDistanceIndex = i
-		end
-		self.team2.players[i].ballDistance = (self.team2.players[i].pos - self.ball.pos):len()
-		if (self.team2.players[i].ballDistance < self.team2.minBallDistance) then
-			self.team2.minBallDistance = self.team2.players[i].ballDistance
-			self.team2.minBallDistanceIndex = i
-		end
+		self:updatePlayerDistances(dt, self.team1.players[i], self.team1.players, self.team2.players)
+		self:updatePlayerDistances(dt, self.team2.players[i], self.team2.players, self.team1.players)
 	end 
+end
 
-	--print("T1:" .. self.team1.players[self.team1.minBallDistanceIndex].name)
-	--print("T2:" .. self.team2.players[self.team2.minBallDistanceIndex].name)
+--[[
+Precalculates distances from this player to many things.
+--]]
+function Match:updatePlayerDistances(dt, player, teammates, rivals)
+	-- distance from player to ball
+	player.ballDistance = (player.pos - self.ball.pos):len()
+	if (player.ballDistance < player.team.minBallDistance) then
+		player.team.minBallDistance = player.ballDistance
+		player.team.minBallDistancePlayer = player
+	end
+	player.minRivalDistance = 9999999999999
+	player.minTeammateDistance = 9999999999999
+	player.rivalsDistance = {}
+	player.teammatesDistance = {}
+	for i=1, 11 do
+		player.rivalsDistance[i] = (player.pos - rivals[i].pos):len()
+		if (player.rivalsDistance[i] < player.minRivalDistance) then
+			player.minRivalDistance = player.rivalsDistance[i]
+			player.minRivalDistancePlayer = rivals[i]
+		end
+		player.teammatesDistance[i] = { distance = (player.pos - teammates[i].pos):len(), player = teammates[i] }
+		if ((player.teammatesDistance[i].distance < player.minTeammateDistance) and not (teammates[i] == player)) then
+			player.minTeammateDistance = player.teammatesDistance[i].distance
+			player.minTeammateDistancePlayer = teammates[i]
+		end
+	end
 
 end
 

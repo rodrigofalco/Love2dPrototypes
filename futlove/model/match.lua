@@ -153,9 +153,9 @@ function Match:updatePlayerDistances(dt, player, teammates, rivals)
 	player.rivalsDistance = {}
 	player.teammatesDistance = {}
 	for i=1, 11 do
-		player.rivalsDistance[i] = (player.pos - rivals[i].pos):len()
-		if (player.rivalsDistance[i] < player.minRivalDistance) then
-			player.minRivalDistance = player.rivalsDistance[i]
+		player.rivalsDistance[i] = { distance = (player.pos - rivals[i].pos):len(), player = rivals[i] }
+		if (player.rivalsDistance[i].distance < player.minRivalDistance) then
+			player.minRivalDistance = player.rivalsDistance[i].distance
 			player.minRivalDistancePlayer = rivals[i]
 		end
 		player.teammatesDistance[i] = { distance = (player.pos - teammates[i].pos):len(), player = teammates[i] }
@@ -186,13 +186,13 @@ function Match.endContact(a, b, coll)
   local contactBetweenPlayerAndBall, ball, player = Match.isContactBetweenPlayerAndBall(a, b)
 	if contactBetweenPlayerAndBall then
 		x,y = coll:getNormal()
-    print(player.name .. " collides with ball -> vector normal: "..x..", "..y)
+    --print(player.name .. " collides with ball -> vector normal: "..x..", "..y)
     
     ball.currentPlayer = player
     player.match.attackingTeam = player.team
 		latestMatchInstance.currentPlayerWithBall = player
 	else
-		print(player.name .. " collides with player -> vector normal: "..x..", "..y)
+		--print(player.name .. " collides with player -> vector normal: "..x..", "..y)
 	end
 end
 

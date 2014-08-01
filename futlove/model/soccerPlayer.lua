@@ -157,4 +157,25 @@ function SoccerPlayer:passBallTo(dt, target)
   self.match.currentPlayerWithBall = nil
 end
 
+function SoccerPlayer:shootAtGoal(dt)
+  print("shootAtGoal:" .. self.name)
+  -- get goalie position
+  local targetVector = self.rivalsDistance[1].player.pos
+  -- the shoot will go towards the goalie, but get a +-5 to it-s Y axis, to go towards the posts
+  local yyskew = math.random(-5,5)
+  targetVector.y = targetVector.y + yyskew
+
+  local distanceVector = targetVector - self.pos
+  local normalizedDistanceVector = distanceVector:normalized()
+  --normalizedDistanceVector
+  local x, y = self.match.ball.body:getPosition()
+
+  self.match.ball.body:setPosition(x + normalizedDistanceVector.x * 20, y + normalizedDistanceVector.y * 20)
+  
+  self.match.ball.body:setAwake(true)
+
+  self.match.ball.body:applyForce(distanceVector.x * 250 , distanceVector.y * 250)
+  self.match.currentPlayerWithBall = nil
+end
+
 return SoccerPlayer

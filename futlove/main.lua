@@ -9,6 +9,9 @@ function love.load()
 	-- To see live sublime console.
 	io.stdout:setvbuf("no")
 
+	-- init random
+	math.randomseed(os.time())
+
   Gamestate.registerEvents()
   Gamestate.switch(matchScene)
 end

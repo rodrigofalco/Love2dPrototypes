@@ -149,11 +149,11 @@ function SoccerPlayer:passBallTo(dt, target)
   --normalizedDistanceVector
   local x, y = self.match.ball.body:getPosition()
 
-  self.match.ball.body:setPosition(x + normalizedDistanceVector.x * 15, y + normalizedDistanceVector.y * 15)
+  self.match.ball.body:setPosition(x + normalizedDistanceVector.x * 20, y + normalizedDistanceVector.y * 20)
   
   self.match.ball.body:setAwake(true)
 
-  self.match.ball.body:applyForce(normalizedDistanceVector.x * 10000 , normalizedDistanceVector.y * 10000)
+  self.match.ball.body:applyForce(distanceVector.x * 100 , distanceVector.y * 100)
   self.match.currentPlayerWithBall = nil
 end
 

@@ -184,11 +184,12 @@ end
 function Match.endContact(a, b, coll)
   --print(a:getUserData().type .. " endContact with " .. b:getUserData().type)
   local contactBetweenPlayerAndBall, ball, player = Match.isContactBetweenPlayerAndBall(a, b)
-	if (contactBetweenPlayerAndBall) then
+	if contactBetweenPlayerAndBall then
 		x,y = coll:getNormal()
     print(player.name .. " collides with ball -> vector normal: "..x..", "..y)
     
     ball.currentPlayer = player
+    player.match.attackingTeam = player.team
 		latestMatchInstance.currentPlayerWithBall = player
 	else
 		print(player.name .. " collides with player -> vector normal: "..x..", "..y)

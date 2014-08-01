@@ -6,9 +6,12 @@ Ball = require "model.ball"
 local matchScene = {
 }
 
+PlayerDebugInfoEnabled = true
+SoccerFieldDebugInfoEnabled = true
+
 function matchScene:init()
   --print("matchScene:init")
-  matchScene.stadium = Stadium.new({ imageSrc = "resources/soccerField800x600.png" })
+  matchScene.stadium = Stadium.new({ imageSrc = "resources/soccerField800x600.png"})
   matchScene.ball = Ball.new({ imageSrc = "resources/brazuca2.png" })
   matchScene.match = Match.new({ 
       team1 = teams.patagonian,

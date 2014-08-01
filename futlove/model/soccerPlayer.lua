@@ -1,7 +1,5 @@
 vector = require "hump.vector"
 
-local debugInfoEnabled = true
-
 -- Player states/behaiviours 
 DefensiveState = require "model.states.defensiveState"
 DefensiveClosestToBallState = require "model.states.defensiveClosestToBallState"
@@ -69,7 +67,7 @@ function SoccerPlayer:draw()
 	-- minus 10 means minus half our image size, in this case, 20px
 	love.graphics.draw(self.image, self.pos.x - 10, self.pos.y - 10)
 
-  if debugInfoEnabled then
+  if PlayerDebugInfoEnabled then
     local x, y = self.body:getLinearVelocity()
     love.graphics.line(self.pos.x, self.pos.y, self.pos.x + x, self.pos.y + y)
     love.graphics.circle( "line", self.pos.x, self.pos.y, 40, 50 )
@@ -162,6 +160,7 @@ function SoccerPlayer:shootAtGoal(dt)
   -- get goalie position
   local targetVector = self.rivalsDistance[1].player.pos
   -- the shoot will go towards the goalie, but get a +-5 to it-s Y axis, to go towards the posts
+  math.randomseed(os.time())
   local yyskew = math.random(-5,5)
   targetVector.y = targetVector.y + yyskew
 

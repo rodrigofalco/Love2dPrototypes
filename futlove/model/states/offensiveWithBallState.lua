@@ -23,7 +23,7 @@ function OffensiveWithBallState.updatePlayerState(dt, player)
     --for i=1, 11 do
     --  print(player.teammatesDistance[i])
     --end
-    
+    math.randomseed(os.time())
     local xx = math.random(2,4)  -- position 1 is myself, the closes at 0 distance
     --print(xx)
     player:passBallTo(dt, player.teammatesDistance[xx].player)

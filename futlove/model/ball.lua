@@ -12,6 +12,7 @@ function Ball.new(options)
   self.rotation = 0
   self.imageSrc = options.imageSrc
   self.type = 'Ball'
+  self.status = 'In'
   return self
 end
 

@@ -1,3 +1,5 @@
+Signals = require 'hump.signal'
+
 local Match = {} -- the table representing the class, which will double as the metatable for the instances
 Match.__index = Match -- failed table lookups on the instances should fallback to the class table, to get methods
 
@@ -7,7 +9,6 @@ Match.config.engine.accelarationAdjustment = 30000
 
 local latestMatchInstance = nil
 
--- syntax equivalent to "Match.new = function..."
 function Match.new(options)
   local self = setmetatable({}, Match)
   self.paused = false
@@ -119,6 +120,20 @@ function Match:update(dt)
 			self.team1.players[i]:update(dt)
 			self.team2.players[i]:update(dt)
 		end 
+
+		-- Check ball is inside field
+		-- get position of the ball from physics engine
+	  local x, y = self.ball.body:getPosition()
+	  -- get field area of stadium
+	  local lim = self.stadium.playableArea
+	  if x < lim.x or x > lim.x + lim.width or y < lim.y or y > lim.y + lim.height then
+	  	--print("Ball is out")
+	  	self.ball.status = 'Out'
+	  	Signals.emit('throw-in', x, y, self.ball.body:getLinearVelocity())
+	  else
+	  	--print("Ball is in")
+	  	self.ball.status = 'In'
+	  end 
 	end 
 
 end

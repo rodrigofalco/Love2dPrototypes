@@ -121,9 +121,13 @@ function Match:update(dt)
 			self.team2.players[i]:update(dt)
 		end 
 
-		-- Check ball is inside field
 		-- get position of the ball from physics engine
 	  local x, y = self.ball.body:getPosition()
+
+    -- check if ball is inside goal
+    --self.stadium.goalAreas
+
+		-- Check ball is inside field
 	  -- get field area of stadium
 	  local lim = self.stadium.playableArea
 	  if x < lim.x or x > lim.x + lim.width or y < lim.y or y > lim.y + lim.height then
@@ -201,8 +205,7 @@ function Match.endContact(a, b, coll)
   local contactBetweenPlayerAndBall, ball, player = Match.isContactBetweenPlayerAndBall(a, b)
 	if contactBetweenPlayerAndBall then
 		x,y = coll:getNormal()
-    --print(player.name .. " collides with ball -> vector normal: "..x..", "..y)
-    
+    print("control:" .. player.name)
     ball.currentPlayer = player
     player.match.attackingTeam = player.team
 		latestMatchInstance.currentPlayerWithBall = player

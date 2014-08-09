@@ -9,6 +9,10 @@ function Stadium.new(options)
   self.width = 800
   self.height = 600
   self.playableArea = options.playableArea or { x = 64, y = 64, width = 606, height = 410 }
+  self.goalAreas = {
+    { x = self.playableArea.x - 26, y = self.playableArea.y + (self.playableArea.height / 2) - 5, width = 25, height = 70},
+    { x = self.playableArea.x + self.playableArea.width + 64, y = self.playableArea.y + (self.playableArea.height / 2) - 5, width = 25, height = 70}
+  }
   self.scaleX = 1
   self.scaleY = 1
   self.rotation = 0
@@ -28,6 +32,12 @@ function Stadium:draw()
     r, g, b, a = love.graphics.getColor()
     local limit = self.playableArea
     --love.graphics.rectangle("line", limit.x, limit.y, limit.x + limit.width, limit.y + limit.height)
+
+    -- Draw goal detection
+    love.graphics.setColor(232, 0, 0, 255)
+    love.graphics.rectangle("line", self.goalAreas[1].x, self.goalAreas[1].y, self.goalAreas[1].width, self.goalAreas[1].height)
+    love.graphics.rectangle("line", self.goalAreas[2].x, self.goalAreas[2].y, self.goalAreas[2].width, self.goalAreas[2].height)
+
     -- Draw corner area
     love.graphics.setColor(232, 0, 0, 255)
     love.graphics.rectangle("line", 0, 0, limit.x, self.height)
@@ -39,9 +49,7 @@ function Stadium:draw()
     love.graphics.rectangle("line", limit.x, limit.y * 2 + limit.height, limit.x + limit.width, self.height)
     
     love.graphics.setColor(r, g, b, a)
-  end
-
-  
+  end  
 end
 
 function Stadium:update(dt)	

@@ -33,7 +33,7 @@ function SoccerPlayer:init(world, match, team)
   -- physics
   self.body = love.physics.newBody(world, self.pos.x, self.pos.y, "dynamic")
   self.shape = love.physics.newCircleShape(10) --the ball's shape has a radius of 20
-  self.fixture = love.physics.newFixture(self.body, self.shape, 5) -- Attach fixture to body and give it a density of 1.
+  self.fixture = love.physics.newFixture(self.body, self.shape, 5) -- Attach fixture to body and give it a density of 5.
   self.fixture:setRestitution(0.05)
   self.body:setLinearDamping(0.9)
   self.fixture:setUserData(self) -- we get this in the colission callback later
@@ -64,8 +64,16 @@ function SoccerPlayer:setFormation(formation)
 end
 
 function SoccerPlayer:draw()
+  local playerCenter = { x = self.pos.x - 10, y = self.pos.y - 10 }
 	-- minus 10 means minus half our image size, in this case, 20px
-	love.graphics.draw(self.image, self.pos.x - 10, self.pos.y - 10)
+	love.graphics.draw(self.image, playerCenter.x, playerCenter.y)
+  love.graphics.setColor(255, 255, 255, 255)
+  if self.number < 10 then
+    love.graphics.print(self.number, self.pos.x - 5, playerCenter.y + 3)
+  else
+    love.graphics.print(self.number, self.pos.x - 8, playerCenter.y + 3)
+  end
+  love.graphics.setColor(r, g, b, a)
 
   if PlayerDebugInfoEnabled then
     local x, y = self.body:getLinearVelocity()
@@ -156,7 +164,7 @@ function SoccerPlayer:passBallTo(dt, target)
 end
 
 function SoccerPlayer:shootAtGoal(dt)
-  print("shootAtGoal:" .. self.name)
+  print("shoot:" .. self.name)
   -- get goalie position
   local targetVector = self.rivalsDistance[1].player.pos
   -- the shoot will go towards the goalie, but get a +-5 to it-s Y axis, to go towards the posts
